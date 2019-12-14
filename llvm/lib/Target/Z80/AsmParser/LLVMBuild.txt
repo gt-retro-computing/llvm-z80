@@ -1,0 +1,6 @@
+[component_0]
+type = Library
+name = Z80AsmParser
+parent = Z80
+required_libraries = MC MCParser Support Z80Desc Z80Info
+add_to_library_groups = Z80
