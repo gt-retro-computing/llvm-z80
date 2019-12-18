@@ -1,0 +1,6 @@
+[component_0]
+type = Library
+name = Z80Desc
+parent = Z80
+required_libraries = MC Support Z80AsmPrinter Z80Info
+add_to_library_groups = Z80

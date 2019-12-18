@@ -1,0 +1,35 @@
+[common]
+subdirectories =
+  AsmParser
+  AsmPrinter
+  MCTargetDesc
+  TargetInfo
+
+[component_0]
+type = TargetGroup
+name = Z80
+parent = Target
+has_asmparser = 1
+has_asmprinter = 1
+has_disassembler = 0
+
+[component_1]
+type = Library
+name = Z80CodeGen
+parent = Z80
+required_libraries =
+  Analysis
+  AsmPrinter
+  CodeGen
+  Core
+  GlobalISel
+  MC
+  SelectionDAG
+  Z80Desc
+  Z80Info
+  Z80AsmPrinter
+  Z80AsmParser
+  Support
+  Target
+  TransformUtils
+add_to_library_groups = Z80

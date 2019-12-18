@@ -95,6 +95,7 @@ public:
     wasm64,         // WebAssembly with 64-bit pointers
     renderscript32, // 32-bit RenderScript
     renderscript64, // 64-bit RenderScript
+    Z80,
     LastArchType = renderscript64
   };
   enum SubArchType {
@@ -128,7 +129,9 @@ public:
     KalimbaSubArch_v4,
     KalimbaSubArch_v5,
 
-    MipsSubArch_r6
+    MipsSubArch_r6,
+
+    Z80_I8080
   };
   enum VendorType {
     UnknownVendor,
