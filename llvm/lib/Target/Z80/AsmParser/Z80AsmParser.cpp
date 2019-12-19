@@ -15,7 +15,7 @@
 #include "llvm/MC/MCInst.h"
 #include "llvm/Support/TargetRegistry.h"
 
-#define DEBUG_TYPE "Z80-asm-parser"
+#define DEBUG_TYPE "Z80-AsmParser"
 
 using namespace llvm;
 using namespace Z80AsmPrinter;
@@ -56,6 +56,41 @@ bool Z80AsmParser::ParseRegister(unsigned &RegNo, SMLoc &StartLoc, SMLoc &EndLoc
   return false;
 }
 
+bool Z80AsmParser::ParseImmediate(OperandVector &Operands) {
+  SMLoc S = Parser.getTok().getLoc();
+  SMLoc E = SMLoc::getFromPointer(Parser.getTok().getLoc().getPointer() - 1);
+
+  const MCExpr *Expr = nullptr;
+  AsmToken::TokenKind kind = getLexer().getKind();
+  switch (kind) {
+    default:
+      return true;
+    case AsmToken::Minus:
+    case AsmToken::Integer:
+      if (getParser().parseExpression(Expr))
+        return true;
+
+      Operands.push_back(Z80Operand::CreateImm(Expr, S, E));
+      return false;
+  }
+}
+
+bool Z80AsmParser::ParseSymbolReference(OperandVector &Operands) {
+  SMLoc S = Parser.getTok().getLoc();
+  StringRef Identifier;
+  if (Parser.parseIdentifier(Identifier))
+    return true;
+
+  SMLoc E = SMLoc::getFromPointer(Parser.getTok().getLoc().getPointer() - 1);
+
+  // TODO relocations?
+
+  // Parse a symbol
+  MCSymbol *Sym = getContext().getOrCreateSymbol(Identifier);
+  const MCExpr *Res = MCSymbolRefExpr::create(Sym, MCSymbolRefExpr::VK_None, getContext());
+  Operands.push_back(Z80Operand::CreateImm(Res, S, E));
+  return false;
+}
 /*
  * return - false: parse success, true: failed to parse
  */
@@ -71,8 +106,11 @@ bool Z80AsmParser::ParseOperand(OperandVector &Operands) {
     return false; // Register Parse Success
   }
 
-  // TODO parse immediate
-
+  // An immediate or expression operand can be alone
+//  SMLoc S = getLexer().getTok().getLoc();
+  if (!ParseImmediate(Operands) || !ParseSymbolReference(Operands)) {
+    return false;
+  }
   return true;
 }
 
@@ -92,9 +130,20 @@ bool Z80AsmParser::ParseInstruction(ParseInstructionInfo &Info, StringRef Name,
   // Parse until end of statement, consuming commas between operands
   while (getLexer().isNot(AsmToken::EndOfStatement)) {
     // Consume comma token
-    if (getLexer().is(AsmToken::Comma)) {
-      getLexer().Lex();
-      continue;
+    switch (getLexer().getKind()) {
+      default: break;
+      case AsmToken::Comma:
+        getLexer().Lex();
+        continue;
+      case AsmToken::LParen:
+        AsmToken LParn = getLexer().Lex();
+        if (!ParseOperand(Operands))
+          // Success
+          getLexer().Lex();
+        else
+        // Fail & backtrack
+          getLexer().UnLex(LParn);
+        continue;
     }
 
     // Parse next operand

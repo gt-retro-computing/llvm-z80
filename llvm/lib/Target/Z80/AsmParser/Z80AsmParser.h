@@ -16,8 +16,7 @@ public:
   enum KindTy {
     k_Token,
     k_Register,
-    k_Imm8,
-    k_Imm16
+    k_Imm,
   } Kind;
   SMLoc StartLoc, EndLoc;
 
@@ -45,7 +44,7 @@ public:
     struct ImmOp Imm;
   };
 
-  void addExpr(MCInst&, const MCExpr* expr) const;
+  void addExpr(MCInst &, const MCExpr *expr) const;
 
   void addRegOperands(MCInst &Inst, unsigned N) const;
 
@@ -83,6 +82,8 @@ public:
 
   static std::unique_ptr<Z80Operand> CreateToken(StringRef Token,
                                                  SMLoc NameLoc);
+
+  static std::unique_ptr<Z80Operand> CreateImm(const MCExpr*, SMLoc, SMLoc);
 };
 
 class Z80AsmParser : public MCTargetAsmParser {
@@ -99,6 +100,10 @@ public:
   }
 
   bool ParseRegister(unsigned &RegNo, SMLoc &StartLoc, SMLoc &EndLoc) override;
+
+  bool ParseImmediate(OperandVector &Operands);
+
+  bool ParseSymbolReference(OperandVector &Operands);
 
   bool ParseOperand(OperandVector &Operands);
 

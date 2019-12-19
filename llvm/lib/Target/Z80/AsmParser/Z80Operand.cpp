@@ -1,8 +1,11 @@
 //
 // Created by codetector on 12/16/19.
 //
+#include "llvm/Support/Casting.h"
 #include "Z80AsmParser.h"
 #include "llvm/MC/MCInst.h"
+
+#define DEBUG_TYPE "Z80-AsmParser"
 
 using namespace llvm;
 using namespace Z80AsmPrinter;
@@ -30,6 +33,13 @@ Z80Operand::CreateToken(StringRef Token, SMLoc NameLoc) {
   return TokOp;
 }
 
+std::unique_ptr<Z80Operand> Z80Operand::CreateImm(const MCExpr *Expr,
+                                             SMLoc Start, SMLoc End) {
+  auto Op = std::make_unique<Z80Operand>(k_Imm, Start, End);
+  Op->Imm.Val = Expr;
+  return Op;
+}
+
 void Z80Operand::addRegOperands(MCInst &Inst, unsigned N) const {
   assert(N == 1 && "Can not add more than 1 reg operand");
   Inst.addOperand(MCOperand::createReg(getReg()));
@@ -37,10 +47,21 @@ void Z80Operand::addRegOperands(MCInst &Inst, unsigned N) const {
 
 void Z80Operand::addImmOperands(MCInst &Inst, unsigned N) const {
   assert(N == 1 && "Invalid # of operands");
+  addExpr(Inst, this->Imm.Val);
 }
 
-void Z80Operand::addExpr(MCInst &, const MCExpr *expr) const {
-
+void Z80Operand::addExpr(MCInst &Inst, const MCExpr *expr) const {
+  if (expr == nullptr) {
+    // NULL
+    LLVM_DEBUG(dbgs() << "addExpr() called with a null expr\n"
+                         "adding an imm(0); \n");
+    Inst.addOperand(MCOperand::createImm(0));
+  } else if (const auto *CE = dyn_cast<MCConstantExpr>(expr)) {
+    LLVM_DEBUG(dbgs() << "Collapsing const expr to imm\n");
+    Inst.addOperand(MCOperand::createImm(CE->getValue()));
+  } else {
+    Inst.addOperand(MCOperand::createExpr(expr));
+  }
 }
 
 StringRef Z80Operand::getToken() const {
@@ -53,7 +74,7 @@ bool Z80Operand::isToken() const {
 }
 
 bool Z80Operand::isImm() const {
-  return this->Kind == k_Imm8 || this->Kind == k_Imm16;
+  return this->Kind == k_Imm;
 }
 
 bool Z80Operand::isReg() const {

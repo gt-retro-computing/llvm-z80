@@ -41,6 +41,12 @@ static MCAsmInfo *createZ80MCAsmInfo(const MCRegisterInfo &MRI,
   return MAI;
 }
 
+static MCInstrInfo *createZ80MCInstrInfo() {
+  MCInstrInfo *X = new MCInstrInfo();
+  InitZ80MCInstrInfo(X);
+  return X;
+}
+
 static MCInstPrinter *createZ80MCInstPrinter(const Triple &T,
                                              unsigned SyntaxVariant,
                                              const MCAsmInfo &MAI,
@@ -58,6 +64,9 @@ extern "C" void LLVMInitializeZ80TargetMC() {
 
   // Register MCAsmInfo
   TargetRegistry::RegisterMCAsmInfo(TheZ80Target, createZ80MCAsmInfo);
+
+  // Register MCInstInfo
+  TargetRegistry::RegisterMCInstrInfo(TheZ80Target, createZ80MCInstrInfo);
 
   // Register MCInstPrinter
   TargetRegistry::RegisterMCInstPrinter(TheZ80Target, createZ80MCInstPrinter);

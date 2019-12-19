@@ -48,8 +48,16 @@ B,C,D,E,H,L,ACC
 def Accumulator : RegisterClass<"Z80", [i8], 8,
 (add ACC)>;
 
-def GR16 : RegisterClass<"Z80", [i16], 8,
+def HLReg : RegisterClass<"Z80", [i16], 8, (add HL)>;
+
+def ALL16 : RegisterClass<"Z80", [i16], 8,
 (add
 BC, DE, HL, SP
+)
+>;
+
+def GR16 : RegisterClass<"Z80", [i16], 8,
+(add
+BC, DE, HL
 )
 >;
