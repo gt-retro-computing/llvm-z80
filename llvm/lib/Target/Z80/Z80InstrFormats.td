@@ -1,3 +1,17 @@
+
+
+// Operand Types
+def imm8: Operand<i8>, ImmLeaf<i8, [{return isInt<8>(Imm);}]> {
+  let EncoderMethod = "getImmOpValue";
+  let MCOperandPredicate = [{
+    int64_t Imm;
+    if (MCOp.evaluateAsConstantImm(Imm))
+      return isInt<8>(Imm);
+    return MCOp.isBareSymbolRef();
+  }];
+}
+
+
 class InstZ80<dag outs, dag ins,
 string opcodestr, string argstr, list<dag> pattern> : Instruction
 {

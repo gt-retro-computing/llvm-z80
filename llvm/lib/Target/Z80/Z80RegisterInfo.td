@@ -24,21 +24,21 @@ class Z80BigReg<bits<16> Enc, string n> : Register<n> {
     int SpillAlignment = 8;
 }
 
-def B : Z80Reg<0, "B">;
-def C : Z80Reg<1, "C">;
-def D : Z80Reg<2, "D">;
-def E : Z80Reg<3, "E">;
-def H : Z80Reg<4, "H">;
-def L : Z80Reg<5, "L">;
-def flags : Z80Reg<6, "F">;
+def B : Z80Reg<0, "b">;
+def C : Z80Reg<1, "c">;
+def D : Z80Reg<2, "d">;
+def E : Z80Reg<3, "e">;
+def H : Z80Reg<4, "h">;
+def L : Z80Reg<5, "l">;
+def flags : Z80Reg<6, "f">;
 
 
-def BC : Z80RegPair<0, "BC", [C,B]>;
-def DE : Z80RegPair<1, "DE", [E,D]>;
-def HL : Z80RegPair<2, "HL", [L,H]>;
-def SP : Z80BigReg <3, "SP">;
+def BC : Z80RegPair<0, "bc", [C,B]>;
+def DE : Z80RegPair<1, "de", [E,D]>;
+def HL : Z80RegPair<2, "hl", [L,H]>;
+def SP : Z80BigReg <3, "sp">;
 
-def ACC : Z80Reg<7, "A">;
+def ACC : Z80Reg<7, "a">;
 
 def GR8 : RegisterClass<"Z80", [i8], 8,
 (add

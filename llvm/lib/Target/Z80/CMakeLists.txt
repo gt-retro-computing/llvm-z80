@@ -29,7 +29,7 @@ add_llvm_target(Z80CodeGen
 # LLVM Targets
 
 # Subdirectories
-add_subdirectory(AsmPrinter)
+add_subdirectory(InstPrinter)
 add_subdirectory(MCTargetDesc)
 add_subdirectory(TargetInfo)
 add_subdirectory(AsmParser)

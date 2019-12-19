@@ -2,42 +2,80 @@
 // Created by codetector on 12/16/19.
 //
 #include "Z80AsmParser.h"
+#include "llvm/MC/MCInst.h"
 
 using namespace llvm;
+using namespace Z80AsmPrinter;
 
-struct Z80Operand : MCParsedAsmOperand {
-  enum KindTy {
-    k_Token,
-    k_Register,
-    k_Imm8,
-    k_Imm16
-  } Kind;
-  SMLoc StartLoc, EndLoc;
+Z80Operand::Z80Operand(const Z80Operand &o) : MCParsedAsmOperand() {
+  Kind = o.Kind;
+  StartLoc = o.StartLoc;
+  EndLoc = o.EndLoc;
+  // TODO Copy Imm / Reg / Token depending on Kind
+}
 
-  enum RegTypeTy {
-    k_Reg8,
-    k_RegPair16
-  };
+std::unique_ptr<Z80Operand>
+Z80Operand::CreateReg(unsigned RegNo, SMLoc Start, SMLoc End) {
+  auto newOperand = std::make_unique<Z80Operand>(k_Register, Start, End);
+  newOperand->Reg.RegNumber = RegNo;
+  // TODO Maybe Reg Type?
+  return newOperand;
+}
 
-  struct Token {
-    const char* Data;
-    unsigned Length;
-  };
+std::unique_ptr<Z80Operand>
+Z80Operand::CreateToken(StringRef Token, SMLoc NameLoc) {
+  auto TokOp = std::make_unique<Z80Operand>(k_Token, NameLoc, NameLoc);
+  TokOp->Tok.Data = Token.data();
+  TokOp->Tok.Length = Token.size();
+  return TokOp;
+}
 
-  struct RegOp {
-    RegTypeTy RegType;
-    uint8_t RegNumber;
-  };
+void Z80Operand::addRegOperands(MCInst &Inst, unsigned N) const {
+  assert(N == 1 && "Can not add more than 1 reg operand");
+  Inst.addOperand(MCOperand::createReg(getReg()));
+}
 
-  struct ImmOp {
-    const MCExpr *Val;
-  };
+void Z80Operand::addImmOperands(MCInst &Inst, unsigned N) const {
+  assert(N == 1 && "Invalid # of operands");
+}
 
-  union {
-    struct Token Tok;
-    struct RegOp Reg;
-    struct ImmOp Imm;
-  };
+void Z80Operand::addExpr(MCInst &, const MCExpr *expr) const {
 
-  Z80Operand(KindTy K) : MCParsedAsmOperand(), Kind(K){}
-};
+}
+
+StringRef Z80Operand::getToken() const {
+  assert(Kind == k_Token && "Trying to get token from a non-token type.");
+  return {Tok.Data, Tok.Length};
+}
+
+bool Z80Operand::isToken() const {
+  return this->Kind == k_Token;
+}
+
+bool Z80Operand::isImm() const {
+  return this->Kind == k_Imm8 || this->Kind == k_Imm16;
+}
+
+bool Z80Operand::isReg() const {
+  return this->Kind == k_Register;
+}
+
+unsigned int Z80Operand::getReg() const {
+  return this->Reg.RegNumber;
+}
+
+bool Z80Operand::isMem() const {
+  // TODO Z80Operand Mem Kind
+  return false;
+}
+
+SMLoc Z80Operand::getStartLoc() const {
+  return this->StartLoc;
+}
+
+SMLoc Z80Operand::getEndLoc() const {
+  return this->EndLoc;
+}
+
+void Z80Operand::print(raw_ostream &OS) const {
+}

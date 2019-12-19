@@ -1,7 +1,7 @@
 [common]
 subdirectories =
   AsmParser
-  AsmPrinter
+  InstPrinter
   MCTargetDesc
   TargetInfo
 
