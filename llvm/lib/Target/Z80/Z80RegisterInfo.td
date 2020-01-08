@@ -45,10 +45,12 @@ def GR8 : RegisterClass<"Z80", [i8], 8,
 B,C,D,E,H,L,ACC
 )>;
 
-def Accumulator : RegisterClass<"Z80", [i8], 8,
+def AccReg : RegisterClass<"Z80", [i8], 8,
 (add ACC)>;
 
 def HLReg : RegisterClass<"Z80", [i16], 8, (add HL)>;
+
+def BCDEReg : RegisterClass<"Z80", [i16], 8, (add BC, DE)>;
 
 def ALL16 : RegisterClass<"Z80", [i16], 8,
 (add

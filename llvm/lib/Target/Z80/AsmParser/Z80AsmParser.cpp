@@ -20,9 +20,11 @@
 using namespace llvm;
 using namespace Z80AsmPrinter;
 
-static unsigned MatchRegisterName(StringRef Name); // Body is generate by tableGen
+static unsigned
+MatchRegisterName(StringRef Name); // Body is generate by tableGen
 #define GET_REGISTER_MATCHER
 #define GET_MATCHER_IMPLEMENTATION
+
 #include "Z80GenAsmMatcher.inc"
 
 bool Z80AsmParser::ParseRegister(unsigned &RegNo, OperandVector &Operands) {
@@ -45,7 +47,9 @@ bool Z80AsmParser::ParseRegister(unsigned &RegNo, OperandVector &Operands) {
       return true;
   }
 }
-bool Z80AsmParser::ParseRegister(unsigned &RegNo, SMLoc &StartLoc, SMLoc &EndLoc) {
+
+bool
+Z80AsmParser::ParseRegister(unsigned &RegNo, SMLoc &StartLoc, SMLoc &EndLoc) {
   SmallVector<std::unique_ptr<MCParsedAsmOperand>, 1> Operands;
   if (ParseRegister(RegNo, Operands))
     return true;
@@ -87,20 +91,39 @@ bool Z80AsmParser::ParseSymbolReference(OperandVector &Operands) {
 
   // Parse a symbol
   MCSymbol *Sym = getContext().getOrCreateSymbol(Identifier);
-  const MCExpr *Res = MCSymbolRefExpr::create(Sym, MCSymbolRefExpr::VK_None, getContext());
+  const MCExpr *Res = MCSymbolRefExpr::create(Sym, MCSymbolRefExpr::VK_None,
+                                              getContext());
   Operands.push_back(Z80Operand::CreateImm(Res, S, E));
   return false;
 }
+
 /*
  * return - false: parse success, true: failed to parse
  */
 bool Z80AsmParser::ParseOperand(OperandVector &Operands) {
   // A register operand is always alone
-  switch (getLexer().getKind()) {
-    // If any special shit need to be processed
-    default:
-      break;
+  auto CurrentTokenKind = getLexer().getKind();
+  if (CurrentTokenKind == AsmToken::LParen) {
+    AsmToken LParn = getLexer().getTok();
+    auto LParnPushback = getLexer().Lex(); // Consume 1 token,
+    // but unlex will use this
+    Operands.push_back(
+            Z80Operand::CreateToken(LParn.getString(), LParn.getLoc()));
+    if (!ParseOperand(Operands)) {
+      // Success
+      auto RParn = getLexer().getTok();
+      getLexer().Lex();
+      Operands.push_back(
+              Z80Operand::CreateToken(RParn.getString(), RParn.getLoc()));
+      return false;
+    } else {
+      // Fail & backtrack
+      Operands.pop_back();
+      getLexer().UnLex(LParnPushback);
+      return true;
+    }
   }
+
   unsigned RegNo = 0;
   if (!ParseRegister(RegNo, Operands)) {
     return false; // Register Parse Success
@@ -130,26 +153,16 @@ bool Z80AsmParser::ParseInstruction(ParseInstructionInfo &Info, StringRef Name,
   // Parse until end of statement, consuming commas between operands
   while (getLexer().isNot(AsmToken::EndOfStatement)) {
     // Consume comma token
-    switch (getLexer().getKind()) {
-      default: break;
-      case AsmToken::Comma:
-        getLexer().Lex();
-        continue;
-      case AsmToken::LParen:
-        AsmToken LParn = getLexer().Lex();
-        if (!ParseOperand(Operands))
-          // Success
-          getLexer().Lex();
-        else
-        // Fail & backtrack
-          getLexer().UnLex(LParn);
-        continue;
+    auto CurrentTokenKind = getLexer().getKind();
+    if (CurrentTokenKind == AsmToken::Comma) {
+      getLexer().Lex();
+      continue;
     }
 
     // Parse next operand
     if (ParseOperand(Operands))
       return true;
-  }
+  } // End While
 
   if (getLexer().isNot(AsmToken::EndOfStatement))
     return Error(getLexer().getTok().getLoc(),
@@ -164,7 +177,8 @@ bool Z80AsmParser::ParseDirective(AsmToken DirectiveID) {
 
 bool Z80AsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
                                            OperandVector &Operands,
-                                           MCStreamer &Out, uint64_t &ErrorInfo,
+                                           MCStreamer &Out,
+                                           uint64_t &ErrorInfo,
                                            bool MatchingInlineAsm) {
   MCInst Inst;
 
