@@ -100,3 +100,12 @@ SMLoc Z80Operand::getEndLoc() const {
 
 void Z80Operand::print(raw_ostream &OS) const {
 }
+
+void Z80Operand::addBranchCCOperand(MCInst &Inst, unsigned N) const {
+  llvm_unreachable("Oops");
+}
+
+bool Z80Operand::isBranchCC() const {
+  return this->Kind == k_BrCC;
+  llvm_unreachable("Unimplemented");
+}

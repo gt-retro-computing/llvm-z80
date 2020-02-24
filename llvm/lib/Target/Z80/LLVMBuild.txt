@@ -1,7 +1,6 @@
 [common]
 subdirectories =
   AsmParser
-  InstPrinter
   MCTargetDesc
   TargetInfo
 
@@ -11,7 +10,7 @@ name = Z80
 parent = Target
 has_asmparser = 1
 has_asmprinter = 1
-has_disassembler = 0
+has_disassembler = 1
 
 [component_1]
 type = Library
@@ -27,7 +26,6 @@ required_libraries =
   SelectionDAG
   Z80Desc
   Z80Info
-  Z80AsmPrinter
   Z80AsmParser
   Support
   Target

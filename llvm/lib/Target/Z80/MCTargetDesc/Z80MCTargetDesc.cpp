@@ -1,7 +1,7 @@
 //
 // Created by codetector on 12/14/19.
 //
-#include "InstPrinter/Z80InstPrinter.h"
+#include "Z80InstPrinter.h"
 #include "Z80MCTargetDesc.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCRegisterInfo.h"

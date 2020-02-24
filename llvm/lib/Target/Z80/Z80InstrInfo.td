@@ -49,16 +49,27 @@ def LD_StoreAi : InstZ80<(outs), (ins AccReg:$a, imm16:$imm),
 // =======================
 let Defs = [flags] in {
 let isCommutable = 1, isAdd = 1 in {
-defm ADD : Z80ALUInst<"add", add>;
-} // let isCommutable = 1...
-let isCommutable = 1 in {
+    defm ADD : Z80ALUInst<"add", add>;
+} // let isCommutable = 1 & isAdd = 1
 let Uses = [flags] in {
-defm ADC : Z80ALUInst<"adc", addc>;
-defm SUC : Z80ALUInst<"suc", subc>;
-}
-}
+    defm ADC : Z80ALUInst<"adc", addc>;
+    defm SUBC : Z80ALUInst<"subc", subc>;
+} // let Uses = [flags]
 defm SUB : Z80ALUInst<"sub", sub>;
 defm AND : Z80ALUInst<"and", and>;
 defm OR : Z80ALUInst<"or", or>;
 defm XOR : Z80ALUInst<"xor", xor>;
 } // let def=[flags]
+
+
+let isBranch = 1 in {
+    def JP : InstZ80<(outs), (ins branch_target:$addr),
+    "jp", "$addr",
+    []
+    >;
+    let Uses = [flags] in
+        def JPcc : InstZ80<(outs), (ins branch_cc: $cc, branch_target:$addr),
+        "jp", "$cc, $addr",
+        []
+        >;
+}

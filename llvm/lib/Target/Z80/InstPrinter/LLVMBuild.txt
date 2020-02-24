@@ -1,6 +1,0 @@
-[component_0]
-type = Library
-name = Z80AsmPrinter
-parent = Z80
-required_libraries = MC Support
-add_to_library_group = Z80

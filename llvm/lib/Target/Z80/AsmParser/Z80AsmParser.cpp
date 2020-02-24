@@ -189,6 +189,12 @@ bool Z80AsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
   return Error(IDLoc, "Failed to parse instruction");
 }
 
+OperandMatchResultTy Z80AsmParser::parseBranchCC(OperandVector &) {
+  return MatchOperand_Success;
+}
+
+
+
 extern "C" void LLVMInitializeZ80AsmParser() {
   RegisterMCAsmParser<Z80AsmParser> X(TheZ80Target);
 }

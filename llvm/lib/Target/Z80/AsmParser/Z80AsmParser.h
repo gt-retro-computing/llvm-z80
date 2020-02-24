@@ -17,6 +17,7 @@ public:
     k_Token,
     k_Register,
     k_Imm,
+    k_BrCC
   } Kind;
   SMLoc StartLoc, EndLoc;
 
@@ -50,11 +51,15 @@ public:
 
   void addImmOperands(MCInst &Inst, unsigned N) const;
 
+  void addBranchCCOperand(MCInst &Inst, unsigned N) const;
+
   bool isToken() const override;
 
   bool isImm() const override;
 
   bool isReg() const override;
+
+  bool isBranchCC() const;
 
   unsigned int getReg() const override;
 
@@ -124,6 +129,9 @@ private:
 
   // Private Helper Function
   bool ParseRegister(unsigned &RegNo, OperandVector &Operands);
+
+  // Matchers
+  OperandMatchResultTy parseBranchCC(OperandVector &);
 };
 
 }

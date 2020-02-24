@@ -1,6 +1,22 @@
 
+def Z80BranchCCAsmOperand: AsmOperandClass {
+  let Name = "BranchCC";
+  let ParserMethod = "parseBranchCC";
+  let PredicateMethod = "isBranchCC";
+  let RenderMethod = "addBranchCCOperand";
+}
 
 // Operand Types
+def branch_target : Operand<OtherVT> {
+  let EncoderMethod = "getJumpTargetOpValue";
+  // let ParserMatchClass = Z80JumpTargetAsmOperand;
+}
+
+def branch_cc : Operand<OtherVT> {
+    let EncoderMethod = "getBranchConditionCodeValue";
+    let ParserMatchClass = Z80BranchCCAsmOperand;
+}
+
 def imm8: Operand<i8>, ImmLeaf<i8, [{return isInt<8>(Imm);}]> {
   let EncoderMethod = "getImmOpValue";
   let MCOperandPredicate = [{
