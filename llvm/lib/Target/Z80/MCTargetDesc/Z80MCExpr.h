@@ -6,11 +6,15 @@
 #define LLVM_Z80MCEXPR_H
 
 #include <llvm/MC/MCExpr.h>
+#include "Z80MCAsmInfo.h"
 
 using namespace llvm;
 
 namespace llvm {
-class Z80BrCCMCExpr: MCTargetExpr {
+class Z80BrCCMCExpr: public MCTargetExpr {
+public:
+  explicit Z80BrCCMCExpr(uint8_t CC_Value);
+
   void anchor() override;
 
   void printImpl(raw_ostream &OS, const MCAsmInfo *MAI) const override;
@@ -23,6 +27,9 @@ class Z80BrCCMCExpr: MCTargetExpr {
   MCFragment *findAssociatedFragment() const override;
 
   void fixELFSymbolsInTLSFixups(MCAssembler &assembler) const override;
+
+private:
+  Z80CondCode cc;
 
 };
 }

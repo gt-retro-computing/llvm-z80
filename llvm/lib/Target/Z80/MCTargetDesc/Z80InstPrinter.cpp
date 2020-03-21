@@ -55,6 +55,9 @@ static void printExpr(const MCExpr *Expr, raw_ostream &OS) {
     case MCExpr::ExprKind ::Constant:
       OS << dyn_cast<MCConstantExpr>(Expr)->getValue();
       break;
+    case MCExpr::ExprKind ::Target:
+      Expr->print(OS, nullptr, false);
+      break;
     default:
       Expr->dump();
       llvm_unreachable("Can't print this MCExpr");

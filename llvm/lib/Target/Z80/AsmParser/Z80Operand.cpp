@@ -1,6 +1,7 @@
 //
 // Created by codetector on 12/16/19.
 //
+#include <MCTargetDesc/Z80MCExpr.h>
 #include "llvm/Support/Casting.h"
 #include "Z80AsmParser.h"
 #include "llvm/MC/MCInst.h"
@@ -111,7 +112,8 @@ void Z80Operand::print(raw_ostream &OS) const {
 void Z80Operand::addBranchCCOperand(MCInst &Inst, unsigned N) const {
   assert(N == 1);
   assert(this->isBranchCC() && "Adding a BR cc with a non-brcc operand");
-  Inst.addOperand(MCOperand::createImm(this->BrCondCode.CC));
+//  Inst.addOperand(MCOperand::createImm(this->BrCondCode.CC));
+  Inst.addOperand(MCOperand::createExpr(new Z80BrCCMCExpr(this->BrCondCode.CC)));
 }
 
 bool Z80Operand::isBranchCC() const {

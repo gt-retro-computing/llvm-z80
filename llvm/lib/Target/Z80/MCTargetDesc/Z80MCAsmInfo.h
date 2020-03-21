@@ -16,6 +16,16 @@ class Z80MCAsmInfo : public MCAsmInfoELF {
 public:
   explicit Z80MCAsmInfo(const Triple &TT);
 };
+enum Z80CondCode {
+    NZ = 0b000,
+    Z = 0b001,
+    NC = 0b010,
+    C = 0b011,
+    PO = 0b100,
+    PE = 0b101,
+    P = 0b110,
+    M = 0b111
+};
 }
 
 #endif //LLVM_Z80ASMINFO_H
