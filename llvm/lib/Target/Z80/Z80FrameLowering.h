@@ -16,7 +16,14 @@ protected:
   const Z80Subtarget &STI;
 public:
   explicit Z80FrameLowering(const Z80Subtarget &sti, uint64_t Alignment)
-          : TargetFrameLowering(StackGrowsDown, Alignment, 0, Alignment), STI(sti) {}
+          : TargetFrameLowering(StackDirection::StackGrowsDown, Align(Alignment), 0, Align(Alignment)), STI(sti) {}
+
+  void emitPrologue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
+
+  void emitEpilogue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
+
+  bool hasFP(const MachineFunction &MF) const override;
+
 };
 }
 

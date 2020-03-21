@@ -59,17 +59,6 @@ class TargetRegisterClass;
 namespace Z80ISD {
 enum NodeType : unsigned {
   FIRST_NUMBER = ISD::BUILTIN_OP_END,
-  RET,
-  CALL,
-  JMP,
-  CMP_JMP,
-  CMPI_JMP,
-  SELECT_MOVE,
-  CMP_SELECT_MOVE,
-  SELECT_CC,
-  SUB_TERM,
-  BR_OFF,
-  LD_AH,
 };
 } // namespace Z80ISD
 
@@ -95,25 +84,25 @@ public:
                       const SmallVectorImpl<SDValue> &OutVals, const SDLoc &DL,
                       SelectionDAG &DAG) const override;
 
-  SDValue LowerCall(CallLoweringInfo & /*CLI*/,
-                    SmallVectorImpl<SDValue> & /*InVals*/) const override;
+//  SDValue LowerCall(CallLoweringInfo & /*CLI*/,
+//                    SmallVectorImpl<SDValue> & /*InVals*/) const override;
 
   // Provide custom lowering hooks for some operations.
   SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
 
   const char *getTargetNodeName(unsigned Opcode) const override;
 
-  std::pair<unsigned, const TargetRegisterClass *>
-  getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
-                               StringRef Constraint,
-                               MVT VT) const override;
+//  std::pair<unsigned, const TargetRegisterClass *>
+//  getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
+//                               StringRef Constraint,
+//                               MVT VT) const override;
 
-  MachineBasicBlock * EmitInstrWithCustomInserter(MachineInstr &MI,
-                                                  MachineBasicBlock *BB) const override;
-
-  bool shouldReduceLoadWidth(SDNode *Load, ISD::LoadExtType ExtTy, EVT NewVT) const override;
-
-  bool canMergeStoresTo(unsigned AS, EVT MemVT, const SelectionDAG &DAG) const override;
+//  MachineBasicBlock * EmitInstrWithCustomInserter(MachineInstr &MI,
+//                                                  MachineBasicBlock *BB) const override;
+//
+//  bool shouldReduceLoadWidth(SDNode *Load, ISD::LoadExtType ExtTy, EVT NewVT) const override;
+//
+//  bool canMergeStoresTo(unsigned AS, EVT MemVT, const SelectionDAG &DAG) const override;
 
 
 

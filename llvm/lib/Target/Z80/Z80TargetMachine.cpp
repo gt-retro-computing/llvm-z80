@@ -29,12 +29,18 @@ Z80TargetMachine::Z80TargetMachine(const llvm::Target &T,
                           TT, CPU, FS, Options,
                           RM.getValueOr(Reloc::Model::Static),
                           CM.getValueOr(CodeModel::Tiny), OL),
-        TLOF(std::make_unique<TargetLoweringObjectFileELF>()) {
+        TLOF(std::make_unique<TargetLoweringObjectFileELF>()),
+        DefaultSubtarget(TT, CPU, FS, *this) {
   initAsmInfo();
 }
 
 TargetLoweringObjectFile *Z80TargetMachine::getObjFileLowering() const {
   return this->TLOF.get();
+}
+
+const TargetSubtargetInfo *
+Z80TargetMachine::getSubtargetImpl(const Function &function) const {
+  return &DefaultSubtarget;
 }
 
 namespace {

@@ -22,6 +22,9 @@ public:
   TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 
   TargetLoweringObjectFile *getObjFileLowering() const override;
+
+  const TargetSubtargetInfo *
+  getSubtargetImpl(const Function &function) const override;
 };
 }
 
