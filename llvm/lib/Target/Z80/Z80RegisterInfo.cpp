@@ -5,8 +5,12 @@
 #include "MCTargetDesc/Z80MCTargetDesc.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/Support/Debug.h"
+#include "llvm/CodeGen/TargetSubtargetInfo.h"
+#include "llvm/CodeGen/TargetFrameLowering.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
+#include "llvm/CodeGen/MachineFunction.h"
 #include "Z80RegisterInfo.h"
+#include "Z80FrameLowering.h"
 
 #define DEBUG_TYPE "Z80-RegisterInfo"
 #define GET_REGINFO_TARGET_DESC

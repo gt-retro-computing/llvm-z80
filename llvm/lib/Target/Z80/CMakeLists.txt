@@ -16,12 +16,12 @@ tablegen(LLVM Z80GenSubtargetInfo.inc -gen-subtarget)
 add_public_tablegen_target(Z80CommonTableGen)
 
 add_llvm_target(Z80CodeGen
-#        Z80AsmPrinter.cpp
-#        Z80FrameLowering.cpp
-#        Z80ISelDAGToDAG.cpp
+        Z80AsmPrinter.cpp
+        Z80FrameLowering.cpp
+        Z80ISelDAGToDAG.cpp
         Z80Subtarget.cpp
         Z80TargetMachine.cpp
-#        Z80ISelLowering.cpp
+        Z80TargetLowering.cpp
         Z80InstrInfo.cpp
         Z80RegisterInfo.cpp
         )
