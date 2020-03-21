@@ -19,6 +19,8 @@ public:
     k_Imm,
     k_BrCC
   } Kind;
+
+
   SMLoc StartLoc, EndLoc;
 
 
@@ -39,10 +41,24 @@ public:
     const MCExpr *Val;
   };
 
+  struct BrCC {
+    enum BrCCTy {
+      NZ = 0b000,
+      Z = 0b001,
+      NC = 0b010,
+      C = 0b011,
+      PO = 0b100,
+      PE = 0b101,
+      P = 0b110,
+      M = 0b111
+    } CC;
+  };
+
   union {
     struct Token Tok;
     struct RegOp Reg;
     struct ImmOp Imm;
+    struct BrCC BrCondCode;
   };
 
   void addExpr(MCInst &, const MCExpr *expr) const;
@@ -88,7 +104,10 @@ public:
   static std::unique_ptr<Z80Operand> CreateToken(StringRef Token,
                                                  SMLoc NameLoc);
 
-  static std::unique_ptr<Z80Operand> CreateImm(const MCExpr*, SMLoc, SMLoc);
+  static std::unique_ptr<Z80Operand> CreateImm(const MCExpr *, SMLoc, SMLoc);
+
+  static std::unique_ptr<Z80Operand>
+  CreateBrCC(const BrCC::BrCCTy, SMLoc, SMLoc);
 };
 
 class Z80AsmParser : public MCTargetAsmParser {

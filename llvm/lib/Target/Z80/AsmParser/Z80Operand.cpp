@@ -40,6 +40,13 @@ std::unique_ptr<Z80Operand> Z80Operand::CreateImm(const MCExpr *Expr,
   return Op;
 }
 
+std::unique_ptr<Z80Operand>
+Z80Operand::CreateBrCC(const BrCC::BrCCTy ty, SMLoc Start, SMLoc End) {
+  auto Op = std::make_unique<Z80Operand>(k_BrCC, Start, End);
+  Op->BrCondCode.CC = ty;
+  return Op;
+}
+
 void Z80Operand::addRegOperands(MCInst &Inst, unsigned N) const {
   assert(N == 1 && "Can not add more than 1 reg operand");
   Inst.addOperand(MCOperand::createReg(getReg()));
@@ -102,7 +109,9 @@ void Z80Operand::print(raw_ostream &OS) const {
 }
 
 void Z80Operand::addBranchCCOperand(MCInst &Inst, unsigned N) const {
-  llvm_unreachable("Oops");
+  assert(N == 1);
+  assert(this->isBranchCC() && "Adding a BR cc with a non-brcc operand");
+  Inst.addOperand(MCOperand::createImm(this->BrCondCode.CC));
 }
 
 bool Z80Operand::isBranchCC() const {

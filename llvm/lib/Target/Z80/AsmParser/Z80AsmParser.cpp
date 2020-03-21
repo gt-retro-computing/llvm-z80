@@ -97,6 +97,9 @@ bool Z80AsmParser::ParseSymbolReference(OperandVector &Operands) {
   return false;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCSimplifyInspection"
+
 /*
  * return - false: parse success, true: failed to parse
  */
@@ -129,13 +132,22 @@ bool Z80AsmParser::ParseOperand(OperandVector &Operands) {
     return false; // Register Parse Success
   }
 
+  if (tryCustomParseOperand(Operands, MCK_BranchCC) ==
+      OperandMatchResultTy::MatchOperand_Success) {
+    return false;
+  }
+
   // An immediate or expression operand can be alone
 //  SMLoc S = getLexer().getTok().getLoc();
   if (!ParseImmediate(Operands) || !ParseSymbolReference(Operands)) {
     return false;
   }
+
+
   return true;
 }
+
+#pragma clang diagnostic pop
 
 bool Z80AsmParser::ParseInstruction(ParseInstructionInfo &Info, StringRef Name,
                                     SMLoc NameLoc, OperandVector &Operands) {
@@ -189,10 +201,35 @@ bool Z80AsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
   return Error(IDLoc, "Failed to parse instruction");
 }
 
-OperandMatchResultTy Z80AsmParser::parseBranchCC(OperandVector &) {
+OperandMatchResultTy Z80AsmParser::parseBranchCC(OperandVector &operands) {
+  auto tok = getLexer().getTok();
+  auto starting_len = operands.size();
+
+  auto str = tok.getString().upper();
+
+  if (str == "NZ") { // Non Zero
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::NZ, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "Z") { // Zero
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::Z, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "NC") { // Non Carry
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::NC, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "C") { // Carry
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::C, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "PO") { // Parity Odd
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::PO, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "PE") { // Parity Even
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::PE, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "P") { // Positive
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::P, tok.getLoc(), tok.getEndLoc()));
+  } else if (str == "M") { // Negative (Minus)
+    operands.push_back(Z80Operand::CreateBrCC(Z80Operand::BrCC::M, tok.getLoc(), tok.getEndLoc()));
+  } else {
+    return MatchOperand_NoMatch;
+  }
+  assert(starting_len < operands.size() && "A success parse resulted in 0 operand vec increment");
+  getLexer().Lex();
   return MatchOperand_Success;
 }
-
 
 
 extern "C" void LLVMInitializeZ80AsmParser() {
