@@ -15,6 +15,10 @@ class Z80InstrInfo : public Z80GenInstrInfo {
   const Z80RegisterInfo RI;
 public:
   Z80InstrInfo();
+
+  void copyPhysReg(MachineBasicBlock &MBB, MachineBasicBlock::iterator MI,
+                   const DebugLoc &DL, MCRegister DestReg, MCRegister SrcReg,
+                   bool KillSrc) const override;
 };
 }
 

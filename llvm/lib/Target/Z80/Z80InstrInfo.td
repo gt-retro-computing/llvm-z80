@@ -1,5 +1,7 @@
 include "Z80InstrFormats.td"
 
+include "Z80ISDNodes.td"
+
 // ================
 // 8 Bit Load Group
 // ================
@@ -43,6 +45,9 @@ def LD_StoreAi : InstZ80<(outs), (ins AccReg:$a, imm16:$imm),
  [(store i8:$a, i16:$imm)]
 >;
 
+def LD16ri : InstZ80<(outs ALL16:$dst), (ins imm16:$imm),
+    "ld", "$dst, $imm",
+    [(set i16:$dst, i16:$imm)]>;
 
 // =======================
 // 8 Bit Arithmetic Group
@@ -63,13 +68,26 @@ defm XOR : Z80ALUInst<"xor", xor>;
 
 
 let isBranch = 1 in {
+let isTerminator=1, isBarrier=1 in
     def JP : InstZ80<(outs), (ins branch_target:$addr),
     "jp", "$addr",
     []
     >;
-    let Uses = [flags] in
+    let Uses = [flags], isTerminator = 1, isPredicable = 1 in
         def JPcc : InstZ80<(outs), (ins branch_cc: $cc, branch_target:$addr),
         "jp", "$cc, $addr",
         []
         >;
 }
+
+let isCall=1 in {
+    let Defs = [SP] in
+    def CALL : InstZ80<(outs), (ins imm16:$target),
+    "call", "$target", []>;
+}
+
+let isReturn=1, isBarrier=1, isTerminator=1 in {
+    let Defs = [SP] in
+        def RET: InstZ80<(outs), (ins), "ret", "", [(z80_ret)]>;
+}
+

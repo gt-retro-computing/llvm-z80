@@ -23,6 +23,9 @@ struct Z80RegisterInfo : public Z80GenRegisterInfo {
                            RegScavenger *RS) const override;
 
   Register getFrameRegister(const MachineFunction &MF) const override;
+
+  const uint32_t *getCallPreservedMask(const MachineFunction &MF,
+                                       CallingConv::ID id) const override;
 };
 }
 

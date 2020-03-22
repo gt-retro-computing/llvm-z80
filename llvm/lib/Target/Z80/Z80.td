@@ -2,6 +2,7 @@ include "llvm/Target/Target.td"
 
 include "Z80RegisterInfo.td"
 include "Z80InstrInfo.td"
+include "Z80CallingConv.td"
 
 def Z80InstrInfo : InstrInfo;
 

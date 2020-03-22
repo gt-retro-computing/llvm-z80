@@ -20,13 +20,23 @@ using namespace llvm;
 
 Z80RegisterInfo::Z80RegisterInfo() : Z80GenRegisterInfo(0,0,0,0) {}
 
+const uint32_t *Z80RegisterInfo::getCallPreservedMask(const MachineFunction &MF,
+                                                      CallingConv::ID id) const {
+  return CC_Save_RegMask;
+}
+
 const MCPhysReg *
 Z80RegisterInfo::getCalleeSavedRegs(const MachineFunction *MF) const {
-  return nullptr;
+  return CC_Save_SaveList;
 }
 
 BitVector Z80RegisterInfo::getReservedRegs(const MachineFunction &MF) const {
-  return BitVector();
+  auto vec = BitVector(getNumRegs());
+
+  vec.set(Z80::SP);
+  vec.set(Z80::flags);
+
+  return vec;
 }
 
 void

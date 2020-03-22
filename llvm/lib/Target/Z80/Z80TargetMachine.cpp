@@ -25,7 +25,8 @@ Z80TargetMachine::Z80TargetMachine(const llvm::Target &T,
                                    Optional<llvm::CodeModel::Model> CM,
                                    llvm::CodeGenOpt::Level OL, bool JIT) :
         LLVMTargetMachine(T,
-                          "",
+                          "e-m:e-p:16:8-i8:8-i16:8-i32:8-i64:8-a:0:8-n8:16-S8",
+
                           TT, CPU, FS, Options,
                           RM.getValueOr(Reloc::Model::Static),
                           CM.getValueOr(CodeModel::Tiny), OL),

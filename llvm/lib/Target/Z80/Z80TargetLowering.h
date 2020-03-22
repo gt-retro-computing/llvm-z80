@@ -59,6 +59,8 @@ class TargetRegisterClass;
 namespace Z80ISD {
 enum NodeType : unsigned {
   FIRST_NUMBER = ISD::BUILTIN_OP_END,
+  RET,
+  CALL
 };
 } // namespace Z80ISD
 
@@ -111,9 +113,9 @@ private:
 //                        const SmallVectorImpl<ISD::InputArg> &Ins,
 //                        bool IsRet) const;
 //
-//  void analyzeOutputArgs(MachineFunction &MF, CCState &CCInfo,
-//                         const SmallVectorImpl<ISD::OutputArg> &Outs,
-//                         bool IsRet, CallLoweringInfo *CLI) const;
+  void analyzeOutputArgs(MachineFunction &MF, CCState &CCInfo,
+                         const SmallVectorImpl<ISD::OutputArg> &Outs,
+                         bool IsRet, CallLoweringInfo *CLI) const;
 //
 //  // copied from LegalizeDAG. We emit our own libcalls not directly supported by LLVM.
 //  SDValue ExpandLibCall(const char *LibcallName, SDValue Op, bool isSigned, SelectionDAG &DAG) const;
