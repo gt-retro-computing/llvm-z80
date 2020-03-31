@@ -27,6 +27,7 @@ Z80TargetLowering::Z80TargetLowering(const Z80TargetMachine &TM,
 
   setStackPointerRegisterToSaveRestore(Z80::SP);
   // setOperationAction
+//  setOperationAction(ISD::BR, MVT::Other, Custom);
 
   // END
 }
@@ -34,9 +35,18 @@ Z80TargetLowering::Z80TargetLowering(const Z80TargetMachine &TM,
 
 SDValue Z80TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
   switch (Op.getOpcode()) {
+    case ISD::BR:
+      return lowerBr(Op, DAG);
     default:
       llvm_unreachable("Unable to lower Operation");
   }
+}
+
+
+SDValue Z80TargetLowering::lowerBr(SDValue Op, SelectionDAG &DAG) const {
+  Op.dump();
+
+  llvm_unreachable("DIE");
 }
 
 const char *Z80TargetLowering::getTargetNodeName(unsigned Opcode) const {

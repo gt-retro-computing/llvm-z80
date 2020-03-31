@@ -13,7 +13,7 @@
 // Z80 Return Value Calling Convention
 //===----------------------------------------------------------------------===//
 def RetCC_Z80 : CallingConv<[
-  CCIfType<[i8], CCPromoteToType<i16>>,
+  CCIfType<[i8], CCAssignToReg<[L]>>,
   CCIfType<[i16], CCAssignToReg<[HL]>>,
   CCIfType<[i8], CCAssignToStack<4,4>>
 ]>;
@@ -23,7 +23,8 @@ def RetCC_Z80 : CallingConv<[
 //===----------------------------------------------------------------------===//
 def CC_Z80 : CallingConv<[
   CCIfByVal<CCPassByVal<1,1>>,
-  CCIfType<[i8], CCAssignToStack<1,1>>,
+  CCIfType<[i8], CCAssignToReg<[C,E,L]>>,
+  CCIfType<[i16], CCAssignToReg<[BC,DE,HL]>>,
   CCIfVarArg<CCAssignToStack<1,1>>
 ]>;
 

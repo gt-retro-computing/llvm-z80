@@ -80,6 +80,9 @@ let isTerminator=1, isBarrier=1 in
         >;
 }
 
+// Br $target -> JMP
+def : Pat<(br bb:$target), (JP branch_target:$target)>;
+
 let isCall=1 in {
     let Defs = [SP] in
     def CALL : InstZ80<(outs), (ins imm16:$target),
