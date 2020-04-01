@@ -20,7 +20,7 @@ def LDSPHL : InstZ80<(outs SPReg:$sp), (ins HLReg:$hl),
 // ===========
 
 def ADD16HLr: InstZ80<(outs HLReg:$hl), (ins HLReg:$hl_src, ALL16:$src),
-"ADD", "$hl, $src",
+"add", "$hl, $src",
 [(set i16:$hl, (add i16:$hl_src, i16:$src))]>;
 
 // ================
