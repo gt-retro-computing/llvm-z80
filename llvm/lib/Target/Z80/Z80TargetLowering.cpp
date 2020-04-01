@@ -21,6 +21,7 @@ Z80TargetLowering::Z80TargetLowering(const Z80TargetMachine &TM,
         TargetLowering(TM), Subtarget(STI) {
   addRegisterClass(MVT::i8, &Z80::GR8RegClass);
   addRegisterClass(MVT::i16, &Z80::ALL16RegClass); //TODO Double check
+//  addRegisterClass(MVT::i16, &Z80::SPRegRegClass);
 
 
   computeRegisterProperties(STI.getRegisterInfo());
@@ -35,18 +36,14 @@ Z80TargetLowering::Z80TargetLowering(const Z80TargetMachine &TM,
 
 SDValue Z80TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
   switch (Op.getOpcode()) {
-    case ISD::BR:
-      return lowerBr(Op, DAG);
+    case ISD::BR_CC:
+      return LowerBR_CC(Op, DAG);
     default:
       llvm_unreachable("Unable to lower Operation");
   }
 }
 
-
-SDValue Z80TargetLowering::lowerBr(SDValue Op, SelectionDAG &DAG) const {
-  Op.dump();
-
-  llvm_unreachable("DIE");
+SDValue Z80TargetLowering::LowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
 }
 
 const char *Z80TargetLowering::getTargetNodeName(unsigned Opcode) const {

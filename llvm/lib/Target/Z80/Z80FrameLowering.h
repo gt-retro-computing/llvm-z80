@@ -24,7 +24,15 @@ public:
 
   bool hasFP(const MachineFunction &MF) const override;
 
-};
+  void adjustReg(MachineBasicBlock &MBB,
+                 MachineBasicBlock::iterator MBBI,
+                 const DebugLoc &DL, Register DestReg,
+                 Register SrcReg, int64_t Val,
+                 MachineInstr::MIFlag Flag) const;
+private:
+  void determineFrameLayout(MachineFunction &MF, bool hasFP) const;
+
+  };
 }
 
 #endif //LLVM_Z80FRAMELOWERING_H

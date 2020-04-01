@@ -85,7 +85,8 @@ void Z80DAGToDAGISel::Select(SDNode *Node) {
 //      SDValue Imm = CurDAG->getTargetConstant(0, DL, XLenVT);
       int FI = cast<FrameIndexSDNode>(Node)->getIndex();
       SDValue TFI = CurDAG->getTargetFrameIndex(FI, VT);
-      ReplaceNode(Node, CurDAG->getMachineNode(Z80::LD8ri, DL, VT, TFI));
+      assert(VT == MVT::i16 && "VT should be a pointer type size");
+      ReplaceNode(Node, CurDAG->getMachineNode(Z80::LD16ri, DL, VT, TFI));
       return;
     }
   }

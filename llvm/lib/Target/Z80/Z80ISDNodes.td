@@ -8,6 +8,13 @@ def SDT_CallSeqEnd        : SDCallSeqEnd<[SDTCisVT<0, i32>,
 
 def SDT_Call        : SDTypeProfile<0, -1, [SDTCisVT<0, i32>]>;
 
+
+//def SDT_CondBr
+
+//=============================================================================
+// Selection DAG Nodes
+//=============================================================================
+
 def callseq_start         : SDNode<"ISD::CALLSEQ_START", SDT_CallSeqStart,
                                    [SDNPHasChain, SDNPOutGlue]>;
 def callseq_end           : SDNode<"ISD::CALLSEQ_END", SDT_CallSeqEnd,

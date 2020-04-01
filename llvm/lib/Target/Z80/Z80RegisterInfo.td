@@ -52,6 +52,8 @@ def HLReg : RegisterClass<"Z80", [i16], 8, (add HL)>;
 
 def BCDEReg : RegisterClass<"Z80", [i16], 8, (add BC, DE)>;
 
+def SPReg: RegisterClass<"Z80", [i16], 8, (add SP)>;
+
 def ALL16 : RegisterClass<"Z80", [i16], 8,
 (add
 BC, DE, HL, SP

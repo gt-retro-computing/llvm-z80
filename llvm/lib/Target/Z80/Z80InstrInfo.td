@@ -2,6 +2,27 @@ include "Z80InstrFormats.td"
 
 include "Z80ISDNodes.td"
 
+
+// =============
+// 16 Bits Load Group
+// =============
+
+def LD16ri : InstZ80<(outs ALL16:$dst), (ins imm16:$imm),
+    "ld", "$dst, $imm",
+    [(set i16:$dst, i16:$imm)]>;
+
+def LDSPHL : InstZ80<(outs SPReg:$sp), (ins HLReg:$hl),
+"ld", "$sp, $hl",
+[(set i16:$sp, i16:$hl)]>;
+
+// ===========
+// 16 bit Arithmetic Group
+// ===========
+
+def ADD16HLr: InstZ80<(outs HLReg:$hl), (ins HLReg:$hl_src, ALL16:$src),
+"ADD", "$hl, $src",
+[(set i16:$hl, (add i16:$hl_src, i16:$src))]>;
+
 // ================
 // 8 Bit Load Group
 // ================
@@ -18,7 +39,7 @@ def LD8ri : InstZ80<(outs GR8:$dr), (ins imm8:$imm),
 
 def LDrHL : InstZ80<(outs GR8:$dr), (ins HLReg:$hlref),
  "ld", "$dr, (${hlref})",
- [(set i8:$dr, (load i16:$hlref))]
+ [(set i8:$dr, (i8 (load i16:$hlref)))]
 >;
 
 def LDHLr : InstZ80<(outs), (ins HLReg:$hlref, GR8:$sr),
@@ -44,10 +65,6 @@ def LD_StoreAi : InstZ80<(outs), (ins AccReg:$a, imm16:$imm),
  "ld", "(${imm}), $a",
  [(store i8:$a, i16:$imm)]
 >;
-
-def LD16ri : InstZ80<(outs ALL16:$dst), (ins imm16:$imm),
-    "ld", "$dst, $imm",
-    [(set i16:$dst, i16:$imm)]>;
 
 // =======================
 // 8 Bit Arithmetic Group

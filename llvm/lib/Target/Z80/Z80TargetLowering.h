@@ -120,9 +120,9 @@ private:
 //  // copied from LegalizeDAG. We emit our own libcalls not directly supported by LLVM.
 //  SDValue ExpandLibCall(const char *LibcallName, SDValue Op, bool isSigned, SelectionDAG &DAG) const;
 //
-//  SDValue lowerBrCc(SDValue Op, SelectionDAG &DAG) const;
-//
-  SDValue lowerBr(SDValue Op, SelectionDAG &DAG) const;
+  SDValue LowerBR_CC(SDValue Op, SelectionDAG &DAG) const;
+
+//  SDValue lowerBr(SDValue Op, SelectionDAG &DAG) const;
 //
 //  SDValue lowerSelectCc(SDValue Op, SelectionDAG &DAG) const;
 //

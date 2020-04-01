@@ -18,7 +18,7 @@ struct Z80RegisterInfo : public Z80GenRegisterInfo {
 
   BitVector getReservedRegs(const MachineFunction &MF) const override;
 
-  void eliminateFrameIndex(MachineBasicBlock::iterator MI, int SPAdj,
+  void eliminateFrameIndex(MachineBasicBlock::iterator MII, int SPAdj,
                            unsigned FIOperandNum,
                            RegScavenger *RS) const override;
 
