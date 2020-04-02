@@ -63,7 +63,7 @@ let isCommutable = 0, isAdd = 1 in {
 } // isAdd = 1
 let Uses = [flags] in {
     defm ADC : Z80ALUInst<"adc", addc>;
-    defm SUBC : Z80ALUInst<"subc", subc>;
+    defm SBC : Z80ALUInst<"sbc", subc>;
 } // let Uses = [flags]
 defm SUB : Z80ALUInst<"sub", sub>;
 defm AND : Z80ALUInst<"and", and>;

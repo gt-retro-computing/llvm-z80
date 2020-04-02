@@ -100,7 +100,7 @@ bool Z80InstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
       }
       BuildMI(MBB, MI, DL, get(Z80::LD8rr), Z80::ACC).addReg(DestLow);
       BuildMI(MBB, MI, DL, get(Z80::ADD_A_i), Z80::ACC).addReg(Z80::ACC).addImm(0x80);
-      BuildMI(MBB, MI, DL, get(Z80::SUBC_A_r), Z80::ACC).addReg(Z80::ACC).addReg(Z80::ACC);
+      BuildMI(MBB, MI, DL, get(Z80::SBC_A_r), Z80::ACC).addReg(Z80::ACC).addReg(Z80::ACC);
       BuildMI(MBB, MI, DL, get(Z80::LD8rr), DestHigh).addReg(Z80::ACC);
       MI.eraseFromParent(); // Erase
       return true;
