@@ -21,7 +21,7 @@ add_llvm_target(Z80CodeGen
         Z80ISelDAGToDAG.cpp
         Z80Subtarget.cpp
         Z80TargetMachine.cpp
-        Z80TargetLowering.cpp
+        Z80ISelLowering.cpp
         Z80InstrInfo.cpp
         Z80RegisterInfo.cpp
         )

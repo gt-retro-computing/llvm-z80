@@ -530,6 +530,7 @@ static bool useFramePointerForTargetByDefault(const ArgList &Args,
   case llvm::Triple::wasm32:
   case llvm::Triple::wasm64:
   case llvm::Triple::msp430:
+  case llvm::Triple::z80: // TODO Z80 Frame pointer Support
     // XCore never wants frame pointers, regardless of OS.
     // WebAssembly never wants frame pointers.
     return false;
@@ -1613,7 +1614,6 @@ void Clang::RenderTargetOptions(const llvm::Triple &EffectiveTriple,
   switch (TC.getArch()) {
   default:
     break;
-
   case llvm::Triple::arm:
   case llvm::Triple::armeb:
   case llvm::Triple::thumb:

@@ -3,18 +3,6 @@ include "Z80InstrFormats.td"
 include "Z80ISDNodes.td"
 
 
-// =============
-// 16 Bits Load Group
-// =============
-
-def LD16ri : InstZ80<(outs ALL16:$dst), (ins imm16:$imm),
-    "ld", "$dst, $imm",
-    [(set i16:$dst, i16:$imm)]>;
-
-def LDSPHL : InstZ80<(outs SPReg:$sp), (ins HLReg:$hl),
-"ld", "$sp, $hl",
-[(set i16:$sp, i16:$hl)]>;
-
 // ===========
 // 16 bit Arithmetic Group
 // ===========
@@ -39,7 +27,7 @@ def LD8ri : InstZ80<(outs GR8:$dr), (ins imm8:$imm),
 
 def LDrHL : InstZ80<(outs GR8:$dr), (ins HLReg:$hlref),
  "ld", "$dr, (${hlref})",
- [(set i8:$dr, (i8 (load i16:$hlref)))]
+ [(set (i8 GR8:$dr), (load HLReg:$hlref))]
 >;
 
 def LDHLr : InstZ80<(outs), (ins HLReg:$hlref, GR8:$sr),
@@ -70,9 +58,9 @@ def LD_StoreAi : InstZ80<(outs), (ins AccReg:$a, imm16:$imm),
 // 8 Bit Arithmetic Group
 // =======================
 let Defs = [flags] in {
-let isCommutable = 1, isAdd = 1 in {
+let isCommutable = 0, isAdd = 1 in {
     defm ADD : Z80ALUInst<"add", add>;
-} // let isCommutable = 1 & isAdd = 1
+} // isAdd = 1
 let Uses = [flags] in {
     defm ADC : Z80ALUInst<"adc", addc>;
     defm SUBC : Z80ALUInst<"subc", subc>;
@@ -111,3 +99,40 @@ let isReturn=1, isBarrier=1, isTerminator=1 in {
         def RET: InstZ80<(outs), (ins), "ret", "", [(z80_ret)]>;
 }
 
+
+// =============
+// 16 Bits Load Group
+// =============
+
+def LD16ri : InstZ80<(outs ALL16:$dst), (ins imm16:$imm),
+    "ld", "$dst, $imm",
+    [(set i16:$dst, (i16 imm16:$imm))]>;
+
+def LDSPHL : InstZ80<(outs SPReg:$sp), (ins HLReg:$hl),
+"ld", "$sp, $hl",
+[]>;
+
+def LDHLIndi : InstZ80<(outs HLReg:$hl), (ins imm16:$addr),
+"ld", "$hl, (${addr})",
+[(set (i16 HLReg:$hl), (load imm16:$addr))]>;
+
+
+// ========
+// PUSH POP
+// ========
+
+def PUSHRP : InstZ80<(outs), (ins GR16:$rp),
+"push", "$rp",
+[]>;
+
+def POPRP: InstZ80<(outs GR16:$rp), (ins),
+"pop", "$rp",
+[]>;
+
+
+// ===========
+// PSEUDO Group
+// ===============
+let Defs=[ACC, flags] in
+def SEXTLOAD_I8 : PseudoZ80<(outs GR16:$dst), (ins imm16:$addr),
+[(set GR16:$dst, (z80_sextload_i8 imm16:$addr))]>;

@@ -12,7 +12,7 @@
 #include "llvm/Target/TargetMachine.h"
 #include "Z80InstrInfo.h"
 #include "Z80FrameLowering.h"
-#include "Z80TargetLowering.h"
+#include "Z80ISelLowering.h"
 
 #define GET_SUBTARGETINFO_HEADER
 #include "Z80GenSubtargetInfo.inc"

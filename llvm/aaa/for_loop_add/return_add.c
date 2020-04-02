@@ -1,4 +1,4 @@
-unsigned char main() {
+unsigned main_lol() {
   unsigned char i = 0;
   for (unsigned char j = 0; j < 10; j++) {
     i += ++j;

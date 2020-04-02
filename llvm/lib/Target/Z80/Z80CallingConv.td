@@ -15,7 +15,7 @@
 def RetCC_Z80 : CallingConv<[
   CCIfType<[i8], CCAssignToReg<[L]>>,
   CCIfType<[i16], CCAssignToReg<[HL]>>,
-  CCIfType<[i8], CCAssignToStack<4,4>>
+  CCIfType<[i8], CCAssignToStack<1,1>>
 ]>;
 
 //===----------------------------------------------------------------------===//
@@ -23,9 +23,10 @@ def RetCC_Z80 : CallingConv<[
 //===----------------------------------------------------------------------===//
 def CC_Z80 : CallingConv<[
   CCIfByVal<CCPassByVal<1,1>>,
-  CCIfType<[i8], CCAssignToReg<[C,E,L]>>,
-  CCIfType<[i16], CCAssignToReg<[BC,DE,HL]>>,
+//  CCIfType<[i8], CCAssignToReg<[C,E,L]>>,
+//  CCIfType<[i16], CCAssignToReg<[BC,DE,HL]>>,
+  CCIfType<[i8], CCAssignToStack<1,1>>,
   CCIfVarArg<CCAssignToStack<1,1>>
 ]>;
 
-def CC_Save : CalleeSavedRegs<(add)>;
+def CC_Save : CalleeSavedRegs<(add BC, DE)>;

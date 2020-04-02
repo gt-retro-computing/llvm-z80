@@ -1,5 +1,8 @@
-; Function Attrs: noinline nounwind optnone sspstrong uwtable
-define dso_local zeroext i8 @main() #0 {
+; ModuleID = 'for_loop_add.ll'
+source_filename = "for_loop_add.ll"
+target datalayout = "e-m:e-p:16:8-i8:8-i16:8-i32:8-i64:8-a:0:8-n8:16-S8"
+target triple = "z80-unknown-unknown"
+define dso_local zeroext i8 @main() {
   %1 = alloca i8, align 1
   %2 = alloca i8, align 1
   store i8 0, i8* %1, align 1

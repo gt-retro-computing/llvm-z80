@@ -44,7 +44,7 @@ void Z80FrameLowering::determineFrameLayout(MachineFunction &MF, bool hasFP) con
     auto TMDL = MF.getDataLayout();
     uint64_t ptr_size = TMDL.getPointerSizeInBits() / 8;
     FrameSize += ptr_size;
-    LLVM_DEBUG(dbgs() << "[TL45FrameLowering::determineFrameLayout] MF: '"
+    LLVM_DEBUG(dbgs() << "[Z80FrameLowering::determineFrameLayout] MF: '"
                       << MF.getName() << "' has frame pointer, incrementing stack frame size by ptr_size.\n");
   }
 
@@ -93,6 +93,19 @@ void Z80FrameLowering::adjustReg(MachineBasicBlock &MBB,
   }
 }
 
+/*
+ * Here's a brief description of what this does
+ *
+ * [if hasFP]
+ *  report_error (can't handle this yet)
+ * [for each callee saved register PAIR]
+ *  push %pair
+ * [allocate space for locals]
+ *  call adjustReg with the correct
+ *
+ *
+ *
+ */
 void llvm::Z80FrameLowering::emitPrologue(llvm::MachineFunction &MF,
                                           llvm::MachineBasicBlock &MBB) const {
   assert(&MF.front() == &MBB && "Shrink-wrapping not yet supported");
@@ -103,9 +116,9 @@ void llvm::Z80FrameLowering::emitPrologue(llvm::MachineFunction &MF,
   const Z80RegisterInfo *RI = STI.getRegisterInfo();
   const Z80InstrInfo *TII = STI.getInstrInfo();
   MachineBasicBlock::iterator MBBI = MBB.begin();
-
   LLVM_DEBUG(dbgs() << "Emitting Prologue for function: " << MF.getName() << "\n");
-
+  Register SPReg = STI.getTargetLowering()->getStackPointerRegisterToSaveRestore();
+  assert(SPReg == Z80::SP && "SP is not sp???");
 
   if (RI->needsStackRealignment(MF) && MFI.hasVarSizedObjects()) {
     report_fatal_error(
@@ -117,62 +130,57 @@ void llvm::Z80FrameLowering::emitPrologue(llvm::MachineFunction &MF,
     LLVM_DEBUG(dbgs() << "Detected Variable Sized Items on stack");
   }
 
-  Register SPReg = Z80::SP;
+  if (hasFramePointer) {
+    report_fatal_error("Z80Backend can't handle FP yet.");
+  }
 
   // Debug location must be unknown since the first debug location is used
   // to determine the end of the prologue.
   DebugLoc DL;
 
-  determineFrameLayout(MF, hasFramePointer);
-
-  // FIXME (note copied from Lanai): This appears to be overallocating.  Needs
-  // investigation. Get the number of bytes to allocate from the FrameInfo.
-  uint64_t StackSize = MFI.getStackSize();
-
-  // Early exit if there is no need to allocate on the stack
-  if (StackSize == 0 && !MFI.adjustsStack())
-    return;
 
 
-
-  // Allocate space on the stack if necessary.
-  // aka Decrement stack pointer
-  adjustReg(MBB, MBBI, DL, SPReg, SPReg, -StackSize, MachineInstr::FrameSetup);
-
-  // Emit ".cfi_def_cfa_offset StackSize"
-  unsigned CFIIndex = MF.addFrameInst(
-          MCCFIInstruction::createDefCfaOffset(nullptr, -StackSize));
-  BuildMI(MBB, MBBI, DL, TII->get(TargetOpcode::CFI_INSTRUCTION))
-          .addCFIIndex(CFIIndex);
-
-  // The frame pointer is callee-saved, and code has been generated for us to
-  // save it to the stack. We need to skip over the storing of callee-saved
-  // registers as the frame pointer must be modified after it has been saved
-  // to the stack, not before.
-  // FIXME: assumes exactly one instruction is used to save each callee-saved
-  // register.
-  const std::vector<CalleeSavedInfo> &CSI = MFI.getCalleeSavedInfo();
-  std::advance(MBBI, CSI.size());
-
-  // Iterate over list of callee-saved registers and emit .cfi_offset
-  // directives.
-  for (const auto &Entry : CSI) {
-    int64_t Offset = MFI.getObjectOffset(Entry.getFrameIdx());
-    Register Reg = Entry.getReg();
-    unsigned CFIIndex = MF.addFrameInst(MCCFIInstruction::createOffset(
-            nullptr, RI->getDwarfRegNum(Reg, true), Offset));
-    BuildMI(MBB, MBBI, DL, TII->get(TargetOpcode::CFI_INSTRUCTION))
-            .addCFIIndex(CFIIndex);
-  }
-
-  if (hasFramePointer) {
-    llvm_unreachable("unable to process frame pointer yet");
-  }
 }
 
 void llvm::Z80FrameLowering::emitEpilogue(llvm::MachineFunction &MF,
                                           llvm::MachineBasicBlock &MBB) const {
-//TODO  llvm_unreachable("Z80::emitEpilogue");
+//  bool hasFramePointer = hasFP(MF);
+//
+//  MachineBasicBlock::iterator MBBI = MBB.getLastNonDebugInstr();
+//  const Z80RegisterInfo *RI = STI.getRegisterInfo();
+//  MachineFrameInfo &MFI = MF.getFrameInfo();
+////  auto *RVFI = MF.getInfo<RISCVMachineFunctionInfo>();
+//  DebugLoc DL = MBBI->getDebugLoc();
+//  const Z80InstrInfo *TII = STI.getInstrInfo();
+////  Register FPReg = TL45::bp;
+//  Register SPReg = Z80::SP;
+//
+//  // Skip to before the restores of callee-saved registers
+//  // FIXME: assumes exactly one instruction is used to restore each
+//  // callee-saved register.
+//  auto LastFrameDestroy = std::prev(MBBI, MFI.getCalleeSavedInfo().size());
+//
+//  uint64_t StackSize = MFI.getStackSize();
+//
+////  uint64_t FPOffset = StackSize;// - RVFI->getVarArgsSaveSize();
+//
+//  // Restore the stack pointer using the value of the frame pointer. Only
+//  // necessary if the stack pointer was modified, meaning the stack size is
+//  // unknown.
+//  if (RI->needsStackRealignment(MF) || MFI.hasVarSizedObjects()) {
+//    assert(hasFramePointer && "frame pointer should not have been eliminated");
+////    adjustReg(MBB, LastFrameDestroy, DL, SPReg, FPReg, -FPOffset,
+////              MachineInstr::FrameDestroy);
+//    // TODO Fixme
+//    BuildMI(MBB, LastFrameDestroy, DL, TII->get(TL45::ADDI)).addReg(SPReg).addReg(FPReg).addImm(-(StackSize - 4));
+//  }
+//
+//  if (hasFramePointer) {
+//
+//    // BP is a linked list!!!
+//    BuildMI(MBB, LastFrameDestroy, DL, TII->get(TL45::LW)).addReg(FPReg).addReg(FPReg).addImm(0);
+//
+//  }
 }
 
 bool llvm::Z80FrameLowering::hasFP(const llvm::MachineFunction &MF) const {

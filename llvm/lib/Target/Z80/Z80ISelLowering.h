@@ -2,8 +2,8 @@
 // Created by codetector on 3/21/20.
 //
 
-#ifndef LLVM_Z80TARGETLOWERING_H
-#define LLVM_Z80TARGETLOWERING_H
+#ifndef LLVM_Z80ISELLOWERING_H
+#define LLVM_Z80ISELLOWERING_H
 
 #include "Z80.h"
 #include "MCTargetDesc/Z80MCTargetDesc.h"
@@ -59,8 +59,9 @@ class TargetRegisterClass;
 namespace Z80ISD {
 enum NodeType : unsigned {
   FIRST_NUMBER = ISD::BUILTIN_OP_END,
+  CALL,
   RET,
-  CALL
+  SEXTLOAD_I8,
 };
 } // namespace Z80ISD
 
@@ -122,6 +123,7 @@ private:
 //
   SDValue LowerBR_CC(SDValue Op, SelectionDAG &DAG) const;
 
+  SDValue LowerLoad(SDValue Op, SelectionDAG &DAG) const ;
 //  SDValue lowerBr(SDValue Op, SelectionDAG &DAG) const;
 //
 //  SDValue lowerSelectCc(SDValue Op, SelectionDAG &DAG) const;
@@ -137,4 +139,4 @@ private:
 };
 
 } // end namespace llvm
-#endif //LLVM_Z80TARGETLOWERING_H
+#endif //LLVM_Z80ISELLOWERING_H

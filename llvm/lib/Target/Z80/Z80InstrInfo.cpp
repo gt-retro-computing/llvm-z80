@@ -27,7 +27,7 @@ static unsigned getRegSize(MCRegister Reg) {
   }
 }
 
-static MCRegister getPairHigh(MCRegister Reg) {
+static Register getPairHigh(Register Reg) {
   switch (Reg) {
     case Z80::BC:
       return Z80::B;
@@ -41,7 +41,7 @@ static MCRegister getPairHigh(MCRegister Reg) {
 }
 
 
-static MCRegister getPairLow(MCRegister Reg) {
+static Register getPairLow(Register Reg) {
   switch (Reg) {
     case Z80::BC:
       return Z80::C;
@@ -75,4 +75,39 @@ void Z80InstrInfo::copyPhysReg(MachineBasicBlock &MBB,
       BuildMI(MBB, MI, DL, get(Z80::LD8rr), getPairLow(DestReg)).addReg(SrcReg);
     }
   }
+}
+
+bool Z80InstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+  MachineBasicBlock &MBB = *MI.getParent();
+  MachineFunction *MF = MBB.getParent();
+  MachineRegisterInfo &MRI = MBB.getParent()->getRegInfo();
+  const DebugLoc &DL = MI.getDebugLoc();
+
+  switch (MI.getOpcode()) {
+    case Z80::SEXTLOAD_I8: {
+      auto DestReg = MI.getOperand(0).getReg();
+      auto AddrImm = MI.getOperand(1);
+      assert(Z80::GR16RegClass.contains(DestReg) && "Dest is a GR16");
+      auto DestLow = getPairLow(DestReg);
+      auto DestHigh = getPairHigh(DestReg);
+      if (DestReg != Z80::HL) {
+        BuildMI(MBB, MI, DL, get(Z80::PUSHRP)).addReg(Z80::HL);
+      }
+      BuildMI(MBB, MI, DL, get(Z80::LD16ri), Z80::HL).add(AddrImm);
+      BuildMI(MBB, MI, DL, get(Z80::LDrHL), DestLow).addReg(Z80::HL);
+      if (DestReg != Z80::HL) {
+        BuildMI(MBB, MI, DL, get(Z80::POPRP), Z80::HL);
+      }
+      BuildMI(MBB, MI, DL, get(Z80::LD8rr), Z80::ACC).addReg(DestLow);
+      BuildMI(MBB, MI, DL, get(Z80::ADD_A_i), Z80::ACC).addReg(Z80::ACC).addImm(0x80);
+      BuildMI(MBB, MI, DL, get(Z80::SUBC_A_r), Z80::ACC).addReg(Z80::ACC).addReg(Z80::ACC);
+      BuildMI(MBB, MI, DL, get(Z80::LD8rr), DestHigh).addReg(Z80::ACC);
+      MI.eraseFromParent(); // Erase
+      return true;
+    }
+    default:
+      break;
+  }
+  llvm_unreachable("DIE");
+  return false;
 }

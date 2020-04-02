@@ -6,7 +6,9 @@
 #define LLVM_Z80INSTRINFO_H
 
 #include "llvm/CodeGen/TargetInstrInfo.h"
+#include "llvm/CodeGen/ISDOpcodes.h"
 #include "Z80RegisterInfo.h"
+
 #define GET_INSTRINFO_HEADER
 #include "Z80GenInstrInfo.inc"
 
@@ -19,6 +21,7 @@ public:
   void copyPhysReg(MachineBasicBlock &MBB, MachineBasicBlock::iterator MI,
                    const DebugLoc &DL, MCRegister DestReg, MCRegister SrcReg,
                    bool KillSrc) const override;
+  bool expandPostRAPseudo(MachineInstr &MI) const override;
 };
 }
 

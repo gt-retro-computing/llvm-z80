@@ -11,5 +11,5 @@ using namespace llvm;
 Target llvm::TheZ80Target;
 
 extern "C" void LLVMInitializeZ80TargetInfo() {
-  RegisterTarget<Triple::Z80> X(TheZ80Target, "z80", "Z80", "Z80");
+  RegisterTarget<Triple::z80> X(TheZ80Target, "z80", "Z80", "Z80");
 }

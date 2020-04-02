@@ -17,7 +17,8 @@ using namespace llvm;
 Z80Subtarget::Z80Subtarget(const Triple &TT, const StringRef CPU, const StringRef FS, const Z80TargetMachine &TM) :
         Z80GenSubtargetInfo(TT, CPU, FS),
         TLInfo(TM, *this),
-        FrameLowering(*this, /* Alignment in units of memory */ 4) {}
+        FrameLowering(*this, /* Alignment in units of memory */ 1) {
+}
 
 const SelectionDAGTargetInfo *Z80Subtarget::getSelectionDAGInfo() const {
   return &TSInfo;
