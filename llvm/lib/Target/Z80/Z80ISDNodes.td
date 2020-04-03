@@ -10,6 +10,7 @@ def SDT_Call        : SDTypeProfile<0, -1, [SDTCisVT<0, iPTR>]>;
 
 
 def SDT_SEXTLOAD_I8 : SDTypeProfile<1, 1, [SDTCisVT<0, i16>, SDTCisVT<1, iPTR>]>;
+def SDT_ZEXTLOAD_I8 : SDTypeProfile<1, 1, [SDTCisVT<0, i16>, SDTCisVT<1, iPTR>]>;
 
 //def SDT_CondBr
 
@@ -31,3 +32,4 @@ def z80_ret            : SDNode<"Z80ISD::RET", SDTNone,
                                    [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
 
 def z80_sextload_i8 : SDNode<"Z80ISD::SEXTLOAD_I8", SDT_SEXTLOAD_I8, [SDNPHasChain]>;
+def z80_zextload_i8 : SDNode<"Z80ISD::ZEXTLOAD_I8", SDT_ZEXTLOAD_I8, [SDNPHasChain]>;

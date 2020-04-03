@@ -62,6 +62,7 @@ enum NodeType : unsigned {
   CALL,
   RET,
   SEXTLOAD_I8,
+  ZEXTLOAD_I8,
 };
 } // namespace Z80ISD
 

@@ -83,7 +83,9 @@ bool Z80InstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
   MachineRegisterInfo &MRI = MBB.getParent()->getRegInfo();
   const DebugLoc &DL = MI.getDebugLoc();
 
-  switch (MI.getOpcode()) {
+  auto Opcode = MI.getOpcode();
+  switch (Opcode) {
+    case Z80::ZEXTLOAD_I8:
     case Z80::SEXTLOAD_I8: {
       auto DestReg = MI.getOperand(0).getReg();
       auto AddrImm = MI.getOperand(1);
@@ -98,10 +100,14 @@ bool Z80InstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
       if (DestReg != Z80::HL) {
         BuildMI(MBB, MI, DL, get(Z80::POPRP), Z80::HL);
       }
-      BuildMI(MBB, MI, DL, get(Z80::LD8rr), Z80::ACC).addReg(DestLow);
-      BuildMI(MBB, MI, DL, get(Z80::ADD_A_i), Z80::ACC).addReg(Z80::ACC).addImm(0x80);
-      BuildMI(MBB, MI, DL, get(Z80::SBC_A_r), Z80::ACC).addReg(Z80::ACC).addReg(Z80::ACC);
-      BuildMI(MBB, MI, DL, get(Z80::LD8rr), DestHigh).addReg(Z80::ACC);
+      if (Opcode == Z80::SEXTLOAD_I8) {
+        BuildMI(MBB, MI, DL, get(Z80::LD8rr), Z80::ACC).addReg(DestLow);
+        BuildMI(MBB, MI, DL, get(Z80::ADD_A_i), Z80::ACC).addReg(Z80::ACC).addImm(0x80);
+        BuildMI(MBB, MI, DL, get(Z80::SBC_A_r), Z80::ACC).addReg(Z80::ACC).addReg(Z80::ACC);
+        BuildMI(MBB, MI, DL, get(Z80::LD8rr), DestHigh).addReg(Z80::ACC);
+      } else {
+        BuildMI(MBB, MI, DL, get(Z80::LD8ri), DestHigh).addImm(0);
+      }
       MI.eraseFromParent(); // Erase
       return true;
     }

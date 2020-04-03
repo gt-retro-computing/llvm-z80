@@ -136,3 +136,6 @@ def POPRP: InstZ80<(outs GR16:$rp), (ins),
 let Defs=[ACC, flags] in
 def SEXTLOAD_I8 : PseudoZ80<(outs GR16:$dst), (ins imm16:$addr),
 [(set GR16:$dst, (z80_sextload_i8 imm16:$addr))]>;
+let Defs=[ACC, flags] in
+def ZEXTLOAD_I8 : PseudoZ80<(outs GR16:$dst), (ins imm16:$addr),
+[(set GR16:$dst, (z80_zextload_i8 imm16:$addr))]>;

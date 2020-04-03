@@ -28,8 +28,10 @@ Z80TargetLowering::Z80TargetLowering(const Z80TargetMachine &TM,
 
   setStackPointerRegisterToSaveRestore(Z80::SP);
   // setOperationAction
-//  setOperationAction(ISD::BR, MVT::Other, Custom);
+
+  // setLoadExtAction
   setLoadExtAction(ISD::SEXTLOAD, MVT::i16, MVT::i8, Custom);
+  setLoadExtAction(ISD::ZEXTLOAD, MVT::i16, MVT::i8, Custom);
 
   // END
 }
@@ -45,6 +47,20 @@ SDValue Z80TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
       llvm_unreachable("Unable to lower Operation");
   }
 }
+const char *Z80TargetLowering::getTargetNodeName(unsigned Opcode) const {
+  switch (Opcode) {
+    case Z80ISD::CALL:
+      return "Z80ISD::CALL";
+    case Z80ISD::RET:
+      return "Z80ISD::RET";
+    case Z80ISD::SEXTLOAD_I8:
+      return "Z80ISD::SEXTLOAD_i8";
+    case Z80ISD::ZEXTLOAD_I8:
+      return "Z80ISD::ZEXTLOAD_i8";
+    default:
+      return nullptr;
+  }
+}
 
 SDValue Z80TargetLowering::LowerLoad(SDValue Op, SelectionDAG &DAG) const {
   assert(Op.getOpcode() == ISD::LOAD && "Wrong ISDNode is mapped to lowering function");
@@ -56,6 +72,7 @@ SDValue Z80TargetLowering::LowerLoad(SDValue Op, SelectionDAG &DAG) const {
   std::vector<EVT> OutTypes;
   switch (loadNode->getExtensionType()) {
     case ISD::SEXTLOAD:
+    case ISD::ZEXTLOAD:
       if (SourceType == MVT::i8 && DestType == MVT::i16) { // SEXT Load I8
         // First two operand should be copied over
         for (unsigned i = 0; i < loadNode->getNumOperands() - 1; ++i) {
@@ -64,7 +81,10 @@ SDValue Z80TargetLowering::LowerLoad(SDValue Op, SelectionDAG &DAG) const {
         for (unsigned i = 0; i < Op->getNumValues(); ++i) {
           OutTypes.push_back(Op->getValueType(i));
         }
-        return DAG.getNode(Z80ISD::SEXTLOAD_I8, DagLoc, OutTypes, Operands);
+        if (loadNode->getExtensionType() == ISD::SEXTLOAD) {
+          return DAG.getNode(Z80ISD::SEXTLOAD_I8, DagLoc, OutTypes, Operands);
+        }
+        return DAG.getNode(Z80ISD::ZEXTLOAD_I8, DagLoc, OutTypes, Operands);
       }
     default:
       llvm_unreachable("Unsupported load extend");
@@ -75,18 +95,6 @@ SDValue Z80TargetLowering::LowerLoad(SDValue Op, SelectionDAG &DAG) const {
 SDValue Z80TargetLowering::LowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
 }
 
-const char *Z80TargetLowering::getTargetNodeName(unsigned Opcode) const {
-  switch (Opcode) {
-    case Z80ISD::CALL:
-      return "Z80ISD::CALL";
-    case Z80ISD::RET:
-      return "Z80ISD::RET";
-    case Z80ISD::SEXTLOAD_I8:
-      return "Z80ISD::SEXTLOAD_i8";
-    default:
-      return nullptr;
-  }
-}
 
 SDValue
 Z80TargetLowering::LowerFormalArguments(SDValue Chain, CallingConv::ID CallConv,
