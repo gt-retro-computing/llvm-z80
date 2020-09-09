@@ -18,19 +18,37 @@ class LLVM_LIBRARY_VISIBILITY Z80TargetInfo : public TargetInfo {
 //  static const Builtin::Info BuiltinInfo[];
 public:
   Z80TargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts) : TargetInfo(Triple) {
-    resetDataLayout(
-            "e-m:e-p:16:8-i8:8-i16:8-i32:8-i64:8-a:0:8-n8:16-S8"
-    );
+    TLSSupported = false;
     PointerWidth = 16;
     PointerAlign = 8;
-    BoolWidth = BoolAlign = 8;
     IntWidth = 16;
     IntAlign = 8;
     LongWidth = 32;
     LongAlign = 8;
     LongLongWidth = 64;
     LongLongAlign = 8;
-    BigEndian = false;
+    SuitableAlign = 8;
+    DefaultAlignForAttributeAligned = 8;
+//    HalfWidth = 16;
+//    HalfAlign = 8;
+//    FloatWidth = 32;
+//    FloatAlign = 8;
+//    DoubleWidth = 32;
+//    DoubleAlign = 8;
+//    DoubleFormat = &llvm::APFloat::IEEEsingle();
+//    LongDoubleWidth = 32;
+//    LongDoubleAlign = 8;
+//    LongDoubleFormat = &llvm::APFloat::IEEEsingle();
+    SizeType = UnsignedInt;
+    PtrDiffType = SignedInt;
+    IntPtrType = SignedInt;
+    Char16Type = UnsignedInt;
+    WIntType = SignedInt;
+    Char32Type = UnsignedLong;
+    SigAtomicType = SignedChar;
+    resetDataLayout(
+            "e-m:e-p:16:8-i8:8-i16:8-i32:8-i64:8-a:0:8-n8-S8"
+    );
   }
 
   void adjustTargetOptions(const CodeGenOptions &CGOpts,
